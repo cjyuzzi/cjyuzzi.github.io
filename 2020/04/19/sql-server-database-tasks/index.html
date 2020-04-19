@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="當在維護現有專案的時候，測試是相當重要的環節，在操作與處理資料時，使用的資料庫可能會碰到以下情境：  測試用資料庫的資料太舊或太空了，甚至連資料庫架構都不一樣了，需要從正式資料庫更新結構和資料過來才能測試。 已上線的網站出現 Bug，為了還原事故現場，需要操作相同的資料才行，但又不能任意更動正式資料庫的內容。 因某些原因，我得將現有的資料庫搬移到另一個地方去。  如果不更新測試用資料庫：  浪費：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="更新與轉移現有資料庫的方式">
+<meta property="og:url" content="https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/index.html">
+<meta property="og:site_name" content="傑瑞派對">
+<meta property="og:description" content="當在維護現有專案的時候，測試是相當重要的環節，在操作與處理資料時，使用的資料庫可能會碰到以下情境：  測試用資料庫的資料太舊或太空了，甚至連資料庫架構都不一樣了，需要從正式資料庫更新結構和資料過來才能測試。 已上線的網站出現 Bug，為了還原事故現場，需要操作相同的資料才行，但又不能任意更動正式資料庫的內容。 因某些原因，我得將現有的資料庫搬移到另一個地方去。  如果不更新測試用資料庫：  浪費：">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/wUvXr71.png">
+<meta property="og:image" content="https://i.imgur.com/XYX4Ee2.png">
+<meta property="og:image" content="https://i.imgur.com/zR20s5F.png">
+<meta property="og:image" content="https://i.imgur.com/9CScFt9.png">
+<meta property="og:image" content="https://i.imgur.com/eDdPWcK.png">
+<meta property="og:image" content="https://i.imgur.com/rbTNyz9.png">
+<meta property="og:image" content="https://i.imgur.com/uYSIcUi.png">
+<meta property="og:image" content="https://i.imgur.com/gEblnST.png">
+<meta property="og:image" content="https://i.imgur.com/rljQp5Y.png">
+<meta property="og:image" content="https://i.imgur.com/zZP8rzQ.png">
+<meta property="og:image" content="https://i.imgur.com/vxdvJGt.png">
+<meta property="og:image" content="https://i.imgur.com/4U2GbBq.png">
+<meta property="og:image" content="https://i.imgur.com/A2PHW5I.png">
+<meta property="og:image" content="https://i.imgur.com/i83S1St.png">
+<meta property="og:image" content="https://i.imgur.com/ZsKcK7r.png">
+<meta property="article:published_time" content="2020-04-19T14:19:00.000Z">
+<meta property="article:modified_time" content="2020-04-19T14:19:55.887Z">
+<meta property="article:author" content="Jerry">
+<meta property="article:tag" content=".Net">
+<meta property="article:tag" content=".Net Core">
+<meta property="article:tag" content="ASP.NET">
+<meta property="article:tag" content="ASP.NET Core">
+<meta property="article:tag" content="程式設計">
+<meta property="article:tag" content="物件導向">
+<meta property="article:tag" content="技術分享">
+<meta property="article:tag" content="後端技術">
+<meta property="article:tag" content="設計模式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/wUvXr71.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>更新與轉移現有資料庫的方式</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首頁</a></li>
+         
+          <li><a href="/about/">關於</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="/projects_url">項目</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2020/04/19/hexo-add-theme/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">回到頁首</span>
+      <span id="i-share" class="info" style="display:none;">分享</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&text=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&title=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&is_video=false&description=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=更新與轉移現有資料庫的方式&body=Check out this article: https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&title=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&title=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&title=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&title=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&name=更新與轉移現有資料庫的方式&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&t=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#資料層應用程式-DAC"><span class="toc-number">1.</span> <span class="toc-text">資料層應用程式 - DAC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SQL-Server-資料庫專案"><span class="toc-number">2.</span> <span class="toc-text">SQL Server 資料庫專案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#操作步驟"><span class="toc-number">2.1.</span> <span class="toc-text">操作步驟</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#參考資料"><span class="toc-number">3.</span> <span class="toc-text">參考資料</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        更新與轉移現有資料庫的方式
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Jerry</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-04-19T14:19:00.000Z" itemprop="datePublished">2020-04-19</time>
+        
+      
+    </div>
+
+
+      
+
+      
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>當在維護現有專案的時候，<strong>測試</strong>是相當重要的環節，在操作與處理資料時，使用的<strong>資料庫</strong>可能會碰到以下情境：</p>
+<ul>
+<li>測試用資料庫的資料太舊或太空了，甚至連資料庫架構都不一樣了，需要從正式資料庫<strong>更新</strong>結構和資料過來才能測試。</li>
+<li>已上線的網站出現 Bug，為了<strong>還原</strong>事故現場，需要操作相同的資料才行，但又不能任意更動正式資料庫的內容。</li>
+<li>因某些原因，我得將現有的資料庫<strong>搬移</strong>到另一個地方去。</li>
+</ul>
+<p>如果不更新測試用資料庫：</p>
+<ul>
+<li>浪費：有測試用資料庫還不用？</li>
+<li>容易混淆其他開發人員：測試用資料庫存在的意義？</li>
+<li>測試時需要提心吊膽與高風險：因為你只能在正式環境測試 … 這不是正確的 ❌</li>
+</ul>
+<p>當測試用資料庫內容已經是最新版本，我們才能<strong>為所欲為地並且放心地</strong>做各式各樣的操作與測試，再也不需要顧慮更動的資料會不會影響已上線網站的使用者。</p>
+<p><a href="https://visualstudio.microsoft.com/zh-hant/vs/" target="_blank" rel="noopener">Visual Studio 2019</a> 與 <a href="https://docs.microsoft.com/zh-tw/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver15" target="_blank" rel="noopener">SSMS</a> 都提供了相當好用的工具：</p>
+<ul>
+<li>資料層應用程式 (Data-tier Applications - DAC)</li>
+<li>Visual Studio 2019 - SQL Server 資料庫專案</li>
+</ul>
+<h2 id="資料層應用程式-DAC"><a href="#資料層應用程式-DAC" class="headerlink" title="資料層應用程式 - DAC"></a>資料層應用程式 - DAC</h2><p>資料層應用程式 (Data-tier Applications，簡稱 DAC)。或許有人已經習慣透過<strong>產生指令碼</strong>來搬移或更新資料庫，但如果長久下來，這種方式將<strong>難以維護</strong>以及<strong>擴展</strong>。DAC 正是為了解決這些問題而出現，它方便開發人員<strong>部屬</strong>及<strong>管理資料庫</strong>的生產力工具，並且攜帶方便。它提供了強大的<strong>比較&amp;偵測變更</strong>與<strong>版本控管</strong>的功能，讓開發人員能在清楚資料庫的變更差異之後，才決定下一個動作，如此慎重地幫我們把關，會大幅降低悲劇的發生。</p>
+<p><a href="https://docs.microsoft.com/zh-tw/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver15" target="_blank" rel="noopener">SSMS</a> 提供了資料層應用程式的各種操作：包含 DACPAC 與 BACPAC：</p>
+<ul>
+<li><p><strong>DACPAC</strong> : 定義了所有資料庫的 SQL Server 物件 : 也就是<strong>資料庫架構</strong> (Schema)，包含表格、檢視表、預存程序、表格之間的關聯性等。使用情境偏向是<strong>資料架構</strong>的<strong>擷取、部屬與更新</strong>。</p>
+<ul>
+<li><strong>擷取</strong> EXTRACT : 將<strong>資料庫架構</strong>封裝成 .dacpac。準備將相同的資料架構部屬到其他環境如本機的測試資料庫。<br><img src="https://i.imgur.com/wUvXr71.png" alt=""></li>
+<li><strong>部屬</strong> DEPLOY : 使用封裝<strong>資料庫架構</strong>的 .dacpac 檔來建立新的資料庫。用於建立新的環境：測試環境、正式環境。<br><img src="https://i.imgur.com/XYX4Ee2.png" alt=""></li>
+<li><strong>升級</strong> UPGRADE : 使用封裝<strong>資料庫架構</strong>的 .dacpac 檔來<strong>更新</strong>現有的資料庫架構。<br><img src="https://i.imgur.com/zR20s5F.png" alt=""></li>
+</ul>
+</li>
+<li><p><strong>BACPAC</strong> : 除了<strong>資料庫架構</strong>之外，還包含了儲存在資料庫內的<strong>資料</strong>。使用情境如最一開始提到的，將現有資料庫<strong>轉移</strong>到其他伺服器或雲端，或是<strong>還原</strong>事故現場，重現相同資料到自己的測試環境。</p>
+<ul>
+<li><strong>匯出</strong> EXPORT : 將<strong>資料庫架構</strong>與<strong>資料庫資料</strong>封裝成 .bacpac。<br><img src="https://i.imgur.com/9CScFt9.png" alt=""></li>
+<li><strong>匯入</strong> IMPORT : 使用封裝<strong>資料庫架構</strong>與<strong>資料庫資料</strong>的 .bacpac 檔來建立新的資料庫。<br><img src="https://i.imgur.com/eDdPWcK.png" alt=""></li>
+</ul>
+</li>
+<li><p><strong>匯出資料</strong>：只包含<strong>資料庫資料</strong>，<span style="color:blue">不推薦</span>，可以單純拿來更新資料，但是這種方式<strong>無法比較資料的差異</strong>，建議使用比較資料的工具完成單純的資料更新，下面會介紹。<br><img src="https://i.imgur.com/rbTNyz9.png" alt=""></p>
+</li>
+<li><p>注意：匯入與部屬的動作需要有 <code>dbmanager</code> 的角色權限才能操作。</p>
+</li>
+</ul>
+<h2 id="SQL-Server-資料庫專案"><a href="#SQL-Server-資料庫專案" class="headerlink" title="SQL Server 資料庫專案"></a>SQL Server 資料庫專案</h2><p>SQL Server 資料庫專案也是管理資料庫非常有效且方便的方式，這裡介紹與此主題相關的功能：</p>
+<ul>
+<li>版本控管：可搭配 Git 做版本控管，主要是維護 .sql 的變更。</li>
+<li><strong>結構描述比較</strong>：用於<strong>更新資料庫架構</strong>，先比較後更新。</li>
+<li><strong>資料比較</strong>：<span style="color:blue">推薦</span>，用於<strong>更新資料庫資料</strong>，同樣為先比較後更新。</li>
+</ul>
+<h3 id="操作步驟"><a href="#操作步驟" class="headerlink" title="操作步驟"></a>操作步驟</h3><ul>
+<li>開啟 Visual Studio 2019 建立新專案 : SQL Server 資料庫專案：<br><img src="https://i.imgur.com/uYSIcUi.png" alt=""></li>
+<li>建立專案：<br><img src="https://i.imgur.com/gEblnST.png" alt=""></li>
+<li>匯入資料庫：可以為指令碼、資料庫(資料連線後擷取)、匯入 DACPAC 檔 (這裡使用這個方式)，擇一即可。<br><img src="https://i.imgur.com/rljQp5Y.png" alt=""></li>
+<li>匯入之後 SQL Server 物件會以 .sql 檔呈現：<br><img src="https://i.imgur.com/zZP8rzQ.png" alt=""></li>
+<li><strong>結構描述比較</strong> : <strong>比較資料庫架構</strong>，可以比較&amp;偵測變更後進行更新。<br><img src="https://i.imgur.com/vxdvJGt.png" alt=""></li>
+<li>選擇<strong>來源</strong>資料庫與<strong>目標</strong>資料庫，並開始進行比較。<ul>
+<li><strong>來源</strong>資料庫：為<strong>基準</strong>的資料庫架構，目標資料庫會被更新為來源資料庫的樣子。</li>
+<li><strong>目標</strong>資料庫：<strong>要更新的資料庫，架構會被變更</strong>成來源資料庫的架構。這裡要特別注意！<span style="color:red;">千萬不要選反了</span>，不然可能發生悲劇。<br><img src="https://i.imgur.com/4U2GbBq.png" alt=""></li>
+</ul>
+</li>
+<li>可自訂要比較的 SQL Server 物件：例如可以忽略角色的比較。<br><img src="https://i.imgur.com/A2PHW5I.png" alt=""></li>
+<li>比較結果：可以清楚地看到架構的差異，並且能自由勾選要更新的資料庫架構項目，確定沒問題後才按更新，這裡最好<strong>再三確認</strong>！<br><img src="https://i.imgur.com/i83S1St.png" alt=""></li>
+<li><strong>資料比較</strong>： <strong>比較資料庫的資料</strong>，可以比較 &amp; 偵測變更後進行更新。推薦使用這種方式進行單純的資料更新，因為你可以確認有哪些變更後再更新，能多一層檢查！步驟跟比較結構描述雷同，就不再進一步說明。<br><img src="https://i.imgur.com/ZsKcK7r.png" alt=""></li>
+</ul>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a href="https://docs.microsoft.com/zh-tw/sql/relational-databases/data-tier-applications/data-tier-applications?view=sql-server-ver15" target="_blank" rel="noopener">MS Docs</a></li>
+<li><a href="https://blog.miniasp.com/" target="_blank" rel="noopener">保哥親授</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首頁</a></li>
+         
+          <li><a href="/about/">關於</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="/projects_url">項目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#資料層應用程式-DAC"><span class="toc-number">1.</span> <span class="toc-text">資料層應用程式 - DAC</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SQL-Server-資料庫專案"><span class="toc-number">2.</span> <span class="toc-text">SQL Server 資料庫專案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#操作步驟"><span class="toc-number">2.1.</span> <span class="toc-text">操作步驟</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#參考資料"><span class="toc-number">3.</span> <span class="toc-text">參考資料</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&text=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&title=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&is_video=false&description=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=更新與轉移現有資料庫的方式&body=Check out this article: https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&title=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&title=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&title=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&title=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&name=更新與轉移現有資料庫的方式&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://cjyuzzi.github.io/2020/04/19/sql-server-database-tasks/&t=更新與轉移現有資料庫的方式" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 選單</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 文章目錄</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 頁首</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2020
+    Jerry
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首頁</a></li>
+         
+          <li><a href="/about/">關於</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="/projects_url">項目</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"In die Zwischenablage kopiert!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Kopiert!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
