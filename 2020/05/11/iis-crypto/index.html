@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="當你使用 IIS 架設一個站台並且綁定 HTTPS 之後，明明憑證是有效的，所有設定看起來都很正常，唯獨使用 Chrome 無法順利連進去，此時心中一定會有滿滿的問號，瀏覽器只顯示一個意義不明的錯誤訊息跟指示 (網路明明沒問題 &#x3D; &#x3D;) 如下圖。這篇記錄了我遇到這個問題後是如何解決的。  當我們在使用 IIS 架設網站的時候，如果伺服器的主機是使用較舊的 Windows 系統，像是 Windows">
 <meta property="og:type" content="article">
-<meta property="og:title" content="IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性">
+<meta property="og:title" content="IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性">
 <meta property="og:url" content="https://cjyuzzi.github.io/2020/05/11/iis-crypto/index.html">
 <meta property="og:site_name" content="傑瑞派對">
 <meta property="og:description" content="當你使用 IIS 架設一個站台並且綁定 HTTPS 之後，明明憑證是有效的，所有設定看起來都很正常，唯獨使用 Chrome 無法順利連進去，此時心中一定會有滿滿的問號，瀏覽器只顯示一個意義不明的錯誤訊息跟指示 (網路明明沒問題 &#x3D; &#x3D;) 如下圖。這篇記錄了我遇到這個問題後是如何解決的。  當我們在使用 IIS 架設網站的時候，如果伺服器的主機是使用較舊的 Windows 系統，像是 Windows">
@@ -29,7 +29,7 @@
 <meta property="og:image" content="https://i.imgur.com/Oa8A719.png">
 <meta property="og:image" content="https://i.imgur.com/0JIDNkP.png">
 <meta property="article:published_time" content="2020-05-11T11:35:00.000Z">
-<meta property="article:modified_time" content="2020-05-11T11:36:06.992Z">
+<meta property="article:modified_time" content="2020-05-11T11:46:03.367Z">
 <meta property="article:author" content="Jerry">
 <meta property="article:tag" content="IIS">
 <meta property="article:tag" content="HTTPS">
@@ -54,7 +54,7 @@
         
     
     <!-- title -->
-    <title>IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性</title>
+    <title>IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性</title>
     <!-- styles -->
     
 <link rel="stylesheet" href="/css/style.css">
@@ -109,21 +109,21 @@
     <div id="share" style="display: none">
       <ul>
   <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://cjyuzzi.github.io/2020/05/11/iis-crypto/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&text=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&is_video=false&description=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性&body=Check out this article: https://cjyuzzi.github.io/2020/05/11/iis-crypto/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&name=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&t=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&text=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&is_video=false&description=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性&body=Check out this article: https://cjyuzzi.github.io/2020/05/11/iis-crypto/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&name=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&t=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
     <div id="toc">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#"><span class="toc-number">1.</span> <span class="toc-text"></span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#檢測你的網站-amp-伺服器安全性"><span class="toc-number">2.</span> <span class="toc-text">檢測你的網站 &amp; 伺服器安全性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#簡介-IIS-Crypto"><span class="toc-number">3.</span> <span class="toc-text">簡介 IIS Crypto</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用-IIS-Crypto-優化伺服器安全性過程"><span class="toc-number">4.</span> <span class="toc-text">使用 IIS Crypto 優化伺服器安全性過程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結語"><span class="toc-number">5.</span> <span class="toc-text">結語</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#檢測你的網站-amp-伺服器安全性"><span class="toc-number">1.</span> <span class="toc-text">檢測你的網站 &amp; 伺服器安全性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#簡介-IIS-Crypto"><span class="toc-number">2.</span> <span class="toc-text">簡介 IIS Crypto</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用-IIS-Crypto-優化伺服器安全性過程"><span class="toc-number">3.</span> <span class="toc-text">使用 IIS Crypto 優化伺服器安全性過程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結語"><span class="toc-number">4.</span> <span class="toc-text">結語</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -135,7 +135,7 @@
   <header>
     
     <h1 class="posttitle" itemprop="name headline">
-        IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性
+        IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性
     </h1>
 
 
@@ -169,7 +169,7 @@
   <div class="content" itemprop="articleBody">
     <p>當你使用 IIS 架設一個站台並且綁定 HTTPS 之後，明明憑證是有效的，所有設定看起來都很正常，唯獨使用 Chrome 無法順利連進去，此時心中一定會有滿滿的問號，瀏覽器只顯示一個意義不明的錯誤訊息跟指示 (網路明明沒問題 = =) 如下圖。這篇記錄了我遇到這個問題後是如何解決的。</p>
 <p><img src="https://i.imgur.com/re1q9xG.png" alt=""></p>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p>當我們在使用 IIS 架設網站的時候，如果伺服器的主機是使用較舊的 Windows 系統，像是 Windows Server 2008 R2 這樣年代較久遠的舊伺服器內的網站，我們就會需要考慮到這台伺服器的安全性可能不夠安全，否則架設好的網站，即使在 IE 或是 Firefox 瀏覽器顯示為安全，但是使用 Chrome 就被判定為不安全的網頁如上圖，並顯示 The connection was rest &amp; 錯誤代碼 ERR_CONNECTION_RESET，其原因可能為：</p>
+<p>當我們在使用 IIS 架設網站的時候，如果伺服器的主機是使用較舊的 Windows 系統，像是 Windows Server 2008 R2 這樣年代較久遠的舊伺服器內的網站，我們就會需要考慮到這台伺服器的安全性可能不夠安全，否則架設好的網站，即使在 IE 或是 Firefox 瀏覽器顯示為安全，但是使用 Chrome 就被判定為不安全的網頁如上圖，並顯示 The connection was rest &amp; 錯誤代碼 ERR_CONNECTION_RESET，其原因可能為：</p>
 <ul>
 <li>伺服器提供的安全協定至少要為 TLS 1.2。</li>
 <li>伺服器還在使用已經被判定為不安全的 SSL 協定 (2.0 或 3.0 皆已不安全)。</li>
@@ -221,22 +221,22 @@
     </div>
 
     <div id="toc-footer" style="display: none">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#"><span class="toc-number">1.</span> <span class="toc-text"></span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#檢測你的網站-amp-伺服器安全性"><span class="toc-number">2.</span> <span class="toc-text">檢測你的網站 &amp; 伺服器安全性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#簡介-IIS-Crypto"><span class="toc-number">3.</span> <span class="toc-text">簡介 IIS Crypto</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用-IIS-Crypto-優化伺服器安全性過程"><span class="toc-number">4.</span> <span class="toc-text">使用 IIS Crypto 優化伺服器安全性過程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結語"><span class="toc-number">5.</span> <span class="toc-text">結語</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#檢測你的網站-amp-伺服器安全性"><span class="toc-number">1.</span> <span class="toc-text">檢測你的網站 &amp; 伺服器安全性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#簡介-IIS-Crypto"><span class="toc-number">2.</span> <span class="toc-text">簡介 IIS Crypto</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用-IIS-Crypto-優化伺服器安全性過程"><span class="toc-number">3.</span> <span class="toc-text">使用 IIS Crypto 優化伺服器安全性過程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結語"><span class="toc-number">4.</span> <span class="toc-text">結語</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
       <ul>
   <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://cjyuzzi.github.io/2020/05/11/iis-crypto/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&text=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&is_video=false&description=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性&body=Check out this article: https://cjyuzzi.github.io/2020/05/11/iis-crypto/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&name=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&t=IIS 站台綁 HTTPS 後卻連不進去！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&text=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&is_video=false&description=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性&body=Check out this article: https://cjyuzzi.github.io/2020/05/11/iis-crypto/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&title=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&name=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://cjyuzzi.github.io/2020/05/11/iis-crypto/&t=IIS 站台綁 HTTPS 後卻無法透過 Chrome 瀏覽！？如何提升伺服器的安全性" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -301,7 +301,7 @@
   <script type="text/javascript">
   $(function() {
     // copy-btn HTML
-    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"In die Zwischenablage kopiert!\">";
     btn += '<i class="far fa-clone"></i>';
     btn += '</span>'; 
     // mount it!
@@ -312,7 +312,7 @@
       }
     });
     clip.on('success', function(e) {
-      e.trigger.setAttribute('aria-label', "Copied!");
+      e.trigger.setAttribute('aria-label', "Kopiert!");
       e.clearSelection();
     })
   })
