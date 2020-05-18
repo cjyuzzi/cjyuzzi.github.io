@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="引言這篇將介紹如何正確地整合後端 ASP.NET Core Web 應用程式與前端 SPA 框架的網站。在現代「前後端分離」架構的趨勢下，相信難免都會碰到兜不起來的狀況，或是覺得哪裡設定「怪怪的」🤔，尤其是每套 SPA 框架內都會有自己的 Routing 路由機制，例如 Angular  Routing 或是 Vue Router。 如果今天有一個需求是要把前後端都放在「同一個站台」內，因此網域">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？">
+<meta property="og:url" content="https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/index.html">
+<meta property="og:site_name" content="傑瑞派對">
+<meta property="og:description" content="引言這篇將介紹如何正確地整合後端 ASP.NET Core Web 應用程式與前端 SPA 框架的網站。在現代「前後端分離」架構的趨勢下，相信難免都會碰到兜不起來的狀況，或是覺得哪裡設定「怪怪的」🤔，尤其是每套 SPA 框架內都會有自己的 Routing 路由機制，例如 Angular  Routing 或是 Vue Router。 如果今天有一個需求是要把前後端都放在「同一個站台」內，因此網域">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/qz2yRGI.png">
+<meta property="og:image" content="https://i.imgur.com/d3JEj17.png">
+<meta property="og:image" content="https://i.imgur.com/AZX1fVy.png">
+<meta property="og:image" content="https://i.imgur.com/22sm0mN.png">
+<meta property="og:image" content="https://i.imgur.com/QTQZYfm.png">
+<meta property="og:image" content="https://i.imgur.com/NSEGdJH.png">
+<meta property="og:image" content="https://i.imgur.com/0h6LMRa.png">
+<meta property="og:image" content="https://i.imgur.com/JwlEeoR.png">
+<meta property="article:published_time" content="2020-05-18T13:13:00.000Z">
+<meta property="article:modified_time" content="2020-05-18T13:14:15.486Z">
+<meta property="article:author" content="Jerry">
+<meta property="article:tag" content="ASP.NET Core">
+<meta property="article:tag" content="SPA">
+<meta property="article:tag" content="Angular">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/qz2yRGI.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首頁</a></li>
+         
+          <li><a href="/about/">關於</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="/projects_url">項目</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2020/05/11/iis-crypto/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">回到頁首</span>
+      <span id="i-share" class="info" style="display:none;">分享</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&text=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&title=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&is_video=false&description=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？&body=Check out this article: https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&title=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&title=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&title=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&title=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&name=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&t=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#引言"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#先備知識"><span class="toc-number">2.</span> <span class="toc-text">先備知識</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#前後端的專案管理"><span class="toc-number">3.</span> <span class="toc-text">前後端的專案管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#放在「相同」的專案內統一管理"><span class="toc-number">3.1.</span> <span class="toc-text">放在「相同」的專案內統一管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#放在「不相同」的專案內各別管理-本篇重點！"><span class="toc-number">3.2.</span> <span class="toc-text">放在「不相同」的專案內各別管理 (本篇重點！)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#將-SPA-網站當作「靜態資源」加入至-ASP-NET-Core-Web-應用程式"><span class="toc-number">4.</span> <span class="toc-text">將 SPA 網站當作「靜態資源」加入至 ASP.NET Core Web 應用程式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結語"><span class="toc-number">5.</span> <span class="toc-text">結語</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Jerry</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-05-18T13:13:00.000Z" itemprop="datePublished">2020-05-18</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/ASP-NET-Core/" rel="tag">ASP.NET Core</a>, <a class="tag-link" href="/tags/Angular/" rel="tag">Angular</a>, <a class="tag-link" href="/tags/SPA/" rel="tag">SPA</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>這篇將介紹如何正確地整合後端 ASP.NET Core Web 應用程式與前端 SPA 框架的網站。在現代「前後端分離」架構的趨勢下，相信難免都會碰到兜不起來的狀況，或是覺得哪裡設定「怪怪的」🤔，尤其是每套 SPA 框架內都會有自己的 Routing 路由機制，例如 <a href="https://angular.io/guide/router" target="_blank" rel="noopener">Angular  Routing</a> 或是 <a href="https://router.vuejs.org" target="_blank" rel="noopener">Vue Router</a>。</p>
+<p>如果今天有一個需求是要把前後端都放在「同一個站台」內，因此<strong>網域名稱相同</strong>，那豈不是會跟後端 Web API 的路由互衝並撞在一起嗎？該如何「正確地」設定 ASP.NET Core 的 <a href="https://docs.microsoft.com/zh-tw/aspnet/core/fundamentals/middleware" target="_blank" rel="noopener">Middleware Pipeline</a> 才對呢？</p>
+<p>以上都是我在開發時遇到的問題，我將提供一個我覺得最簡單的解決方案供大家參考。👍</p>
+<p>範例使用的工具為 Visual Studio 2019，而前後端專案分別為 :</p>
+<ul>
+<li>ASP.NET Core 3.1 Web API</li>
+<li>Angular 9.1.6</li>
+</ul>
+<h2 id="先備知識"><a href="#先備知識" class="headerlink" title="先備知識"></a>先備知識</h2><ul>
+<li>MS Docs : <a href="https://docs.microsoft.com/zh-tw/aspnet/core/fundamentals/middleware" target="_blank" rel="noopener">ASP.NET Core Middleware</a></li>
+</ul>
+<h2 id="前後端的專案管理"><a href="#前後端的專案管理" class="headerlink" title="前後端的專案管理"></a>前後端的專案管理</h2><p>整合 SPA 前端框架主要區分為兩種不同的情境。首先，要先確認前後端的專案<strong>是否</strong>放在相同的專案內管理，會依照不同的管理方式選出最符合的整合方式。</p>
+<p>一般我還是偏好前端與後端的專案<strong>拆開來管理</strong>。</p>
+<p>在寫前後端分離的專案，分開管理的方式會比較常見，尤其在多人開發的情況下，可以大幅降低版本控管的複雜度。而將前後端放在相同專案內的情況，一般比較會聯想到的是 MVC 框架，SSR 的應用就相當地多。接下來將介紹前後端原始碼分開管理與各別管理的差異。</p>
+<h3 id="放在「相同」的專案內統一管理"><a href="#放在「相同」的專案內統一管理" class="headerlink" title="放在「相同」的專案內統一管理"></a>放在「<strong>相同</strong>」的專案內<strong>統一</strong>管理</h3><p><img src="https://i.imgur.com/qz2yRGI.png" alt=""></p>
+<p>先簡單介紹一下這個情境，可<strong>參考</strong> Visual Studio 提供的專案範本進行實作，整合的方式主要是環繞在 <a href="https://github.com/dotnet/aspnetcore/tree/master/src/Middleware/SpaServices" target="_blank" rel="noopener">SpaServices</a> 這個命名空間內並調用 <code>UseSpaStaticFiles()</code> &amp; <code>UseSpa()</code> 等擴充方法進行設定，感覺他們把這東西弄得超複雜的 … 目前還沒機會嘗試，要再找時間研究研究。🤔</p>
+<ul>
+<li>大致的功能有 :<ul>
+<li>能夠統一管理前後端的「專案原始碼」。</li>
+<li>能夠「同時建置」前後端的專案，幫你執行 npm 指令像是 <code>npm start</code>。</li>
+<li>建置模式可自由搭配 : 只建置後端、只建置前端、同時建置前後端。</li>
+<li>支援 SSR (Server Side Rendering) 伺服器端渲染。</li>
+<li>其他 …。</li>
+</ul>
+</li>
+<li>可參考文件 :<ul>
+<li>簡易的教學 : <a href="https://docs.microsoft.com/zh-tw/aspnet/core/client-side/spa/angular" target="_blank" rel="noopener">MS Docs - 搭配 ASP.NET Core 使用 Angular 專案範本</a>。</li>
+<li>提供詳細的說明 : <a href="https://github.com/dotnet/aspnetcore/tree/master/src/Middleware/SpaServices" target="_blank" rel="noopener">Github - SpaServices Middleware</a>。</li>
+<li><a href="https://stackoverflow.com/questions/55988045/what-is-the-difference-between-usestaticfiles-usespastaticfiles-and-usespa-in" target="_blank" rel="noopener">Stack overflow - What is the difference between UseStaticFiles, UseSpaStaticFiles, and UseSpa ?</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="放在「不相同」的專案內各別管理-本篇重點！"><a href="#放在「不相同」的專案內各別管理-本篇重點！" class="headerlink" title="放在「不相同」的專案內各別管理 (本篇重點！)"></a>放在「<strong>不相同</strong>」的專案內<strong>各別</strong>管理 (本篇重點！)</h3><p>這篇<strong>主要</strong>會介紹前後端專案放在「<strong>不相同</strong>」的專案內管理的時候，如何將前後端「完美地」整合到同一個站台內，情境圖如下：</p>
+<p><img src="https://i.imgur.com/d3JEj17.png" alt=""></p>
+<p>其實，前端專案 CLI 框架在「建置」完之後，那些要拿來部屬的檔案也不過就是由 .html、 .js、.css、圖片組成的一個純「靜態網站」罷了，因此，我們可以將 SPA 網站當作是一個「<strong>靜態資源</strong>」加入至 ASP.NET Core Web 應用程式中，最後想辦法將根目錄導向 index.html 就好了。</p>
+<p>比起先前提到使用 <a href="https://github.com/dotnet/aspnetcore/tree/master/src/Middleware/SpaServices" target="_blank" rel="noopener">SpaServices</a> 命名空間系列的設定方式，我認為這樣的整合方式<strong>更簡單、更直覺</strong>，下面會示範如何加入靜態網站至 ASP.NET Core Web 應用程式。</p>
+<blockquote>
+<p>即使網站不是使用 SPA 框架撰寫，是單純的 HTML 靜態網站的話，也適用於這樣的整合方式哦，因為同樣是靜態網頁。</p>
+</blockquote>
+<p>關於 ASP.NET Core 「靜態資源」的深入說明，有興趣的可以參考 :</p>
+<ul>
+<li><a href="https://blog.darkthread.net/blog/aspnetcore-practice-static-files/" target="_blank" rel="noopener">黑暗執行緒 - ASP.NET Core 基礎 - 使用靜態檔案</a>。</li>
+<li><a href="https://docs.microsoft.com/zh-tw/aspnet/core/fundamentals/static-files" target="_blank" rel="noopener">MS Docs - ASP.NET Core 中的靜態檔案</a>。</li>
+</ul>
+<h2 id="將-SPA-網站當作「靜態資源」加入至-ASP-NET-Core-Web-應用程式"><a href="#將-SPA-網站當作「靜態資源」加入至-ASP-NET-Core-Web-應用程式" class="headerlink" title="將 SPA 網站當作「靜態資源」加入至 ASP.NET Core Web 應用程式"></a>將 SPA 網站當作「靜態資源」加入至 ASP.NET Core Web 應用程式</h2><ol>
+<li><p>建立 ASP.NET Core Web API 應用程式。<br><img src="https://i.imgur.com/AZX1fVy.png" alt=""></p>
+</li>
+<li><p>右鍵加入 &gt; 新增「<strong>wwwroot</strong>」資料夾。<br><img src="https://i.imgur.com/22sm0mN.png" alt=""></p>
+</li>
+<li><p>設定 <strong>Middleware Pipeline</strong> 加入 <code>app.UseDefaultFiles()</code> &amp; <code>app.UseStaticFiles()</code> :</p>
+ <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configure</span>(<span class="params">IApplicationBuilder app, IWebHostEnvironment env</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    app.UseHttpsRedirection();</span><br><span class="line"></span><br><span class="line">    app.UseDefaultFiles(); <span class="comment">// 為了從「/」自動導向至「/index.html」。</span></span><br><span class="line">    app.UseStaticFiles(); <span class="comment">// 設定 wwwroot 資料夾內的靜態檔案能夠被瀏覽。</span></span><br><span class="line"></span><br><span class="line">    app.UseRouting();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> <strong>實務上</strong>，可直接使用 <code>app.UseFileServer()</code> 取而代之 : 效果等同於 <code>app.UseDefaultFiles()</code> + <code>app.UseStaticFiles()</code> + <code>app.UseDirectoryBrowser()</code> (可傳入參數 <code>true</code> 開啟，預設為關閉。)</p>
+ <figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configure</span>(<span class="params">IApplicationBuilder app, IWebHostEnvironment env</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    app.UseHttpsRedirection();</span><br><span class="line"></span><br><span class="line">    app.UseFileServer(); <span class="comment">// 已包含 app.UseDefaultFiles() + app.UseStaticFiles()</span></span><br><span class="line"></span><br><span class="line">    app.UseRouting();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>前端 Angular 專案內<strong>調整</strong> app-routing.module.ts : 設定 <code>useHash</code> 讓 Angular Routing 網址前面加上 <code>#</code> 運作，利用 <a href="hashLocationStrategy">HashLocationStrategy</a> 解決前後端 Routing 互衝並撞在一起的問題。</p>
+ <figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="meta">@NgModule</span>(&#123;</span><br><span class="line">  imports: [RouterModule.forRoot(routes, &#123; useHash: <span class="literal">true</span> &#125;)], <span class="comment">// 開啟 useHash。</span></span><br><span class="line">  exports: [RouterModule]</span><br><span class="line">&#125;)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>建置</strong> Angular 專案準備部屬 :</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ng build --prod</span><br></pre></td></tr></table></figure></li>
+<li><p>回到 ASP.NET Core Web 應用程式專案，將 Angular 網站<strong>部屬</strong>到 <strong>wwwroot</strong> 資料夾內。<br><img src="https://i.imgur.com/QTQZYfm.png" alt=""></p>
+</li>
+<li><p>使用 <strong>Ctrl + F5</strong> 瀏覽檢查結果</p>
+<ul>
+<li>確認 API 是否正常運作。✔<br><img src="https://i.imgur.com/NSEGdJH.png" alt=""></li>
+<li>確認 Angular 網站是否正常運作。✔<br><img src="https://i.imgur.com/0h6LMRa.png" alt=""></li>
+</ul>
+</li>
+<li><p>完成，成功地整合在一起了 ✌</p>
+</li>
+</ol>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>這樣就成功地整合一個 SPA 網站到 ASP.NET Core Web 應用程式了 😁。我們只要將 SPA 網站當作「靜態資源」來設定的話，一切都會變得簡單又直覺，然後在前端專案對路由的設定動個手腳，最後妥善區分前後端的路由，一切就大功告成！</p>
+<p>透過以上的設定，使用者在瀏覽網站的情況大致如下圖：</p>
+<ul>
+<li>使用者只能透過 HTTP / GET 請求根目錄 <code>/</code> 才能進入 Angular 網站，進入之後，因為網址皆為 <code>/#/</code> 開頭因此能完美運行 Angular 的路由機制。</li>
+<li>其餘的請求將會繼續往下執行其他的 Middleware，例如 <code>app.UseRouting()</code> &amp; <code>app.UseEndpoints(...)</code>。</li>
+</ul>
+<p><img src="https://i.imgur.com/JwlEeoR.png" alt=""></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首頁</a></li>
+         
+          <li><a href="/about/">關於</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="/projects_url">項目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#引言"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#先備知識"><span class="toc-number">2.</span> <span class="toc-text">先備知識</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#前後端的專案管理"><span class="toc-number">3.</span> <span class="toc-text">前後端的專案管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#放在「相同」的專案內統一管理"><span class="toc-number">3.1.</span> <span class="toc-text">放在「相同」的專案內統一管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#放在「不相同」的專案內各別管理-本篇重點！"><span class="toc-number">3.2.</span> <span class="toc-text">放在「不相同」的專案內各別管理 (本篇重點！)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#將-SPA-網站當作「靜態資源」加入至-ASP-NET-Core-Web-應用程式"><span class="toc-number">4.</span> <span class="toc-text">將 SPA 網站當作「靜態資源」加入至 ASP.NET Core Web 應用程式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結語"><span class="toc-number">5.</span> <span class="toc-text">結語</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&text=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&title=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&is_video=false&description=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？&body=Check out this article: https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&title=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&title=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&title=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&title=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&name=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://cjyuzzi.github.io/2020/05/18/aspnetcore-spa/&t=SPA 框架的網站到底如何正確地與 ASP.NET Core 整合！？" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 選單</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 文章目錄</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 頁首</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2020
+    Jerry
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首頁</a></li>
+         
+          <li><a href="/about/">關於</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="/projects_url">項目</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"In die Zwischenablage kopiert!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Kopiert!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
