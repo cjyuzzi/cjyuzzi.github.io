@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="引言郵件服務通知在系統內通常扮演著一個很重要的角色，網路上可以查到很多範例程式都是使用 .Net 平台內建的 SmtpClient 發 E-Mail 郵件，但是此 API 已被微軟標示為已過時，僅適用於舊的應用程式作相容，可參考這篇文章的說明。微軟「建議」新開發的專案使用 MailKit 或者是其他第三方套件來開發。 這篇將介紹如何使用 MailKit 發送 E-Mail 郵件的基礎，我們開始吧！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何使用 MailKit 在 .NET Core 發送 Email 電子郵件">
+<meta property="og:url" content="https://cjyuzzi.github.io/2020/05/22/mailkit-basic/index.html">
+<meta property="og:site_name" content="傑瑞派對">
+<meta property="og:description" content="引言郵件服務通知在系統內通常扮演著一個很重要的角色，網路上可以查到很多範例程式都是使用 .Net 平台內建的 SmtpClient 發 E-Mail 郵件，但是此 API 已被微軟標示為已過時，僅適用於舊的應用程式作相容，可參考這篇文章的說明。微軟「建議」新開發的專案使用 MailKit 或者是其他第三方套件來開發。 這篇將介紹如何使用 MailKit 發送 E-Mail 郵件的基礎，我們開始吧！">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/ONShimg.png">
+<meta property="og:image" content="https://i.imgur.com/FL2q6Z6.png">
+<meta property="og:image" content="https://i.imgur.com/uoqz0gm.png">
+<meta property="article:published_time" content="2020-05-21T16:07:00.000Z">
+<meta property="article:modified_time" content="2020-05-21T16:10:53.220Z">
+<meta property="article:author" content="Jerry">
+<meta property="article:tag" content=".NET Core">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/ONShimg.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="/images/favicon.ico">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+          
+        
+    
+    <!-- title -->
+    <title>如何使用 MailKit 在 .NET Core 發送 Email 電子郵件</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+      
+<link rel="stylesheet" href="/css/rtl.css">
+
+    
+    <!-- rss -->
+    
+    
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">首頁</a></li>
+         
+          <li><a href="/about/">關於</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="/projects_url">項目</a></li>
+        
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/2020/05/20/wire-shark-basic/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">回到頁首</span>
+      <span id="i-share" class="info" style="display:none;">分享</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/" target="_blank" rel="noopener"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&text=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&title=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&is_video=false&description=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件&body=Check out this article: https://cjyuzzi.github.io/2020/05/22/mailkit-basic/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&title=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&title=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&title=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&title=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&name=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&t=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#引言"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安裝"><span class="toc-number">2.</span> <span class="toc-text">安裝</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結語"><span class="toc-number">3.</span> <span class="toc-text">結語</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#參考資料"><span class="toc-number">4.</span> <span class="toc-text">參考資料</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        如何使用 MailKit 在 .NET Core 發送 Email 電子郵件
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Jerry</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-05-21T16:07:00.000Z" itemprop="datePublished">2020-05-22</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/NET-Core/" rel="tag">.NET Core</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>郵件服務通知在系統內通常扮演著一個很重要的角色，網路上可以查到很多範例程式都是使用 .Net 平台內建的 <a href="https://docs.microsoft.com/en-us/dotnet/api/system.net.mail.smtpclient" target="_blank" rel="noopener">SmtpClient</a> 發 E-Mail 郵件，但是此 API 已被微軟標示為<strong>已過時</strong>，僅適用於舊的應用程式作相容，可參考<a href="https://github.com/dotnet/platform-compat/blob/master/docs/DE0005.md" target="_blank" rel="noopener">這篇文章</a>的說明。微軟「<strong>建議</strong>」新開發的專案使用 <a href="http://www.mimekit.net" target="_blank" rel="noopener">MailKit</a> 或者是其他第三方套件來開發。</p>
+<p>這篇將介紹如何使用 <a href="http://www.mimekit.net" target="_blank" rel="noopener">MailKit</a> 發送 E-Mail 郵件的基礎，我們開始吧！🤗</p>
+<h2 id="安裝"><a href="#安裝" class="headerlink" title="安裝"></a>安裝</h2><ol>
+<li><strong>安裝</strong>：使用 <a href="https://www.nuget.org/packages/MailKit" target="_blank" rel="noopener">NuGet</a> 套件管理員或是 .NET Core CLI : </li>
+</ol>
+<p><img src="https://i.imgur.com/ONShimg.png" alt=""></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dotnet add package MailKit</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Install-Package MailKit</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>加入</strong> <code>using</code> 命名空間：</li>
+</ol>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> MimeKit;</span><br><span class="line"><span class="keyword">using</span> MailKit.Net.Smtp;</span><br><span class="line"><span class="keyword">using</span> MailKit.Security;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>建立</strong>一封 <code>MimeMessage</code> 郵件的實體：<ul>
+<li>郵件的<strong>地址</strong>：建立 <code>MailboxAddress</code> 實體</li>
+<li><code>MimeMessage</code> 的實體可以設定多種屬性：<ul>
+<li><code>From</code> : 寄件者</li>
+<li><code>To</code> : 收件者</li>
+<li><code>Cc</code> : 副本</li>
+<li><code>Subject</code> : 主旨</li>
+<li>其他 …</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> MimeMessage <span class="title">CreateEmailMessage</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> message = <span class="keyword">new</span> MimeMessage();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> <span class="keyword">from</span> = <span class="keyword">new</span> MailboxAddress(<span class="string">"Doggy"</span>, <span class="string">"jerryc@miniasp.com"</span>);</span><br><span class="line">    <span class="keyword">var</span> to = <span class="keyword">new</span> MailboxAddress(<span class="string">"Gmail"</span>, <span class="string">"miniasp.jerry@gmail.com"</span>);</span><br><span class="line"></span><br><span class="line">    message.Subject = <span class="string">"Test123"</span>;</span><br><span class="line">    message.From.Add(<span class="keyword">from</span>);</span><br><span class="line">    message.To.Add(to);</span><br><span class="line">    message.Body = GetEmailBody();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> message;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><strong>建立</strong> <code>Body</code> 郵件的內容：推薦使用 <code>BodyBuilder</code> 來建立。 👉 <a href="http://www.mimekit.net/docs/html/Creating-Messages.htm#UsingBodyBuilder" target="_blank" rel="noopener">詳細用法</a></li>
+</ol>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> MimeEntity <span class="title">GetEmailBody</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> bodyBuilder = <span class="keyword">new</span> BodyBuilder();</span><br><span class="line">    </span><br><span class="line">    bodyBuilder.HtmlBody = <span class="string">"&lt;h1&gt;Hello World!&lt;/h1&gt;"</span>;</span><br><span class="line">    bodyBuilder.TextBody = <span class="string">"Hello World!"</span>;</span><br><span class="line">    </span><br><span class="line">    AttachFile(bodyBuilder);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> bodyBuilder.ToMessageBody();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><strong>加入</strong> <code>Attachments</code> 附加檔案：</li>
+</ol>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">AttachFile</span>(<span class="params">BodyBuilder builder</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    builder.Attachments.Add(<span class="string">@"images\hello.jpg"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li><p><strong>接著</strong>，郵件的內容已經大致上完成了，現在只要<strong>設定</strong>好 <code>SmtpClient</code> 的實體後就可以準備發送了！我們需要：</p>
+<ul>
+<li><p>SMTP 的連線資訊：<code>Host</code>、<code>Port</code>、<code>Username</code>、<code>Password</code>、<code>SecureSocketOptions</code>（安全性設定）</p>
+</li>
+<li><p>這裡推薦一個「免費」給開發人員測試的 SMTP Server : <a href="https://mailtrap.io/" target="_blank" rel="noopener">Mailtrap</a>，下圖就是 Mailtrap 提供的 SMTP 連線資訊：</p>
+<p><img src="https://i.imgur.com/FL2q6Z6.png" alt=""></p>
+</li>
+<li><p>對照著填入之後 <code>SmtpClient</code> 的設定就大功告成囉 ✨</p>
+</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">async</span> Task&lt;SmtpClient&gt; <span class="title">CreateSmtpClient</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> client = <span class="keyword">new</span> SmtpClient();</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">await</span> client.ConnectAsync(<span class="string">"smtp_host"</span>, <span class="string">"smtp_port"</span>, SecureSocketOptions.StartTls);</span><br><span class="line">    <span class="keyword">await</span> client.AuthenticateAsync(<span class="string">"username"</span>, <span class="string">"password"</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> client;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li><strong>最後</strong>，建立 <code>MimeMessage</code> &amp; <code>SmtpClient</code> 的實體，並調用 <code>SendAsync()</code> 發送信件。發送完成後如果不再使用，請記得關閉連線調用 <code>DisconnectAsync(true)</code>。</li>
+</ol>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">async</span> Task <span class="title">SendEmail</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> message = CreateEmailMessage(); <span class="comment">// 步驟 3 ~ 5</span></span><br><span class="line">    <span class="keyword">using</span> <span class="keyword">var</span> client = <span class="keyword">await</span> CreateSmtpClient(); <span class="comment">// 步驟 6</span></span><br><span class="line">    <span class="keyword">await</span> client.SendAsync(message);</span><br><span class="line">    <span class="keyword">await</span> client.DisconnectAsync(<span class="literal">true</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>你不需要手動調用 <code>Dispose()</code> 釋放 <code>SmtpClient</code>，只要使用 <code>using</code> 即可自動完成。<br><strong>注意</strong> ✋ <code>using</code> 並不會幫你關閉連線 <code>DisconnectAsync(true)</code>。</p>
+</blockquote>
+<ol start="8">
+<li><p><strong>完成</strong>！成功收到信，這次的練習範例程式我已經上傳到 Github 供大家參考 👉 <a href="https://github.com/cjyuzzi/core-ex-mailkit" target="_blank" rel="noopener">傳送門</a></p>
+<p> <img src="https://i.imgur.com/uoqz0gm.png" alt=""></p>
+</li>
+</ol>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>以上為使用 MailKit 發送郵件的基本用法，實作下來比想像中的還要簡單，只要「三步驟」就可以完成功能：</p>
+<ol>
+<li>建立郵件主體的實體：<code>MimeMessage</code>。</li>
+<li>建立 SMTP Client 連線實體：<code>SmtpClient</code>。</li>
+<li>發送：<code>Send</code>。</li>
+</ol>
+<p>當然，客戶的需求通常會更複雜一些，MailKit 也支援更多種進階的應用，想了解更多的朋友可以參考<a href="http://www.mimekit.net/docs" target="_blank" rel="noopener">官方文件</a>。</p>
+<h2 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h2><ul>
+<li><a href="http://www.mimekit.net/docs" target="_blank" rel="noopener">MailKit Docs</a></li>
+<li><a href="https://github.com/jstedfast/MailKit" target="_blank" rel="noopener">MailKit Github</a></li>
+<li><a href="http://www.binaryintellect.net/articles/e30d07c6-6f57-43e7-a2ce-6d2d67ebf403.aspx" target="_blank" rel="noopener">Send Emails In ASP.NET Core In 5 Easy Steps</a></li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">首頁</a></li>
+         
+          <li><a href="/about/">關於</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="/projects_url">項目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#引言"><span class="toc-number">1.</span> <span class="toc-text">引言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安裝"><span class="toc-number">2.</span> <span class="toc-text">安裝</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結語"><span class="toc-number">3.</span> <span class="toc-text">結語</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#參考資料"><span class="toc-number">4.</span> <span class="toc-text">參考資料</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/" target="_blank" rel="noopener"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&text=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&title=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&is_video=false&description=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件&body=Check out this article: https://cjyuzzi.github.io/2020/05/22/mailkit-basic/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&title=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&title=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&title=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&title=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&name=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件&description=" target="_blank" rel="noopener"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://cjyuzzi.github.io/2020/05/22/mailkit-basic/&t=如何使用 MailKit 在 .NET Core 發送 Email 電子郵件" target="_blank" rel="noopener"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> 選單</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> 文章目錄</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> 頁首</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2020
+    Jerry
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">首頁</a></li>
+         
+          <li><a href="/about/">關於</a></li>
+         
+          <li><a href="/archives/">文章</a></li>
+         
+          <li><a href="/projects_url">項目</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+
+<link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css">
+
+
+    <!-- jquery -->
+
+<script src="/lib/jquery/jquery.min.js"></script>
+
+
+<script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script>
+
+<!-- clipboard -->
+
+  
+<script src="/lib/clipboard/clipboard.min.js"></script>
+
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"In die Zwischenablage kopiert!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Kopiert!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+</body>
+</html>
